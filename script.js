@@ -35,52 +35,40 @@ marked.setOptions({
  * Parse JSON-escaped string to normal string
  * Handles multiple formats:
  * 1. JSON string with quotes: "text\\nmore text"
- * 2. Raw string with escape sequences: text\nmore text
+ * 2. Raw string with escape sequences: text\nmore text  
  * 3. Double-escaped sequences: text\\nmore text
  */
 function parseJsonString(input) {
     let text = input.trim();
 
     // Method 1: Try parsing as a complete JSON string (with surrounding quotes)
-    // This handles: "# Title\\n\\nContent"
     if (text.startsWith('"') && text.endsWith('"')) {
         try {
             return JSON.parse(text);
         } catch (e) {
-            // If JSON.parse fails, try manual unescaping
-            text = text.slice(1, -1); // Remove surrounding quotes
+            // If JSON.parse fails, remove quotes and continue with manual parsing
+            text = text.slice(1, -1);
         }
     }
 
-    // Method 2: Check if it contains double-escaped sequences (\\n, \\t, etc.)
-    // This handles strings like: # Title\\n\\nContent (without surrounding quotes)
-    if (text.includes('\\\\') || text.includes('\\n') || text.includes('\\t') || text.includes('\\r')) {
-        // First, handle double-escaped backslashes: \\\\ -> (temp marker)
-        let parsed = text.replace(/\\\\\\\\/g, '\u0000BACKSLASH\u0000');
+    // Method 2: Manual escape sequence replacement
+    // Use split/join for reliable replacement (avoids regex escaping issues)
 
-        // Handle escaped sequences: \\n -> \n, \\t -> \t, etc.
-        parsed = parsed
-            .replace(/\\\\n/g, '\n')
-            .replace(/\\\\t/g, '\t')
-            .replace(/\\\\r/g, '\r')
-            .replace(/\\\\"/g, '"')
-            .replace(/\\\\'/g, "'");
+    // Handle double-escaped sequences first: \\n -> \n
+    text = text.split('\\\\n').join('\n');
+    text = text.split('\\\\t').join('\t');
+    text = text.split('\\\\r').join('\r');
+    text = text.split('\\\\"').join('"');
+    text = text.split("\\\\'").join("'");
+    text = text.split('\\\\\\\\').join('\\');
 
-        // Handle single-escaped sequences: \n -> newline (if still remaining)
-        parsed = parsed
-            .replace(/\\n/g, '\n')
-            .replace(/\\t/g, '\t')
-            .replace(/\\r/g, '\r')
-            .replace(/\\"/g, '"')
-            .replace(/\\'/g, "'");
+    // Handle single-escaped sequences: \n -> newline
+    text = text.split('\\n').join('\n');
+    text = text.split('\\t').join('\t');
+    text = text.split('\\r').join('\r');
+    text = text.split('\\"').join('"');
+    text = text.split("\\'").join("'");
 
-        // Restore actual backslashes
-        parsed = parsed.replace(/\u0000BACKSLASH\u0000/g, '\\');
-
-        return parsed;
-    }
-
-    // Method 3: Return as-is if no escape sequences detected
     return text;
 }
 
