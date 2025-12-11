@@ -52,24 +52,51 @@ function parseJsonString(input) {
     }
 
     // Method 2: Manual escape sequence replacement
-    // Use split/join for reliable replacement (avoids regex escaping issues)
+    // The user types literal backslash followed by n in the textarea
+    // In JS string, we need to match: backslash (\) + n, which is written as '\\n' in code
+    // But text.split('\\n') in JS matches the actual 2-char sequence: \ and n
 
-    // Handle double-escaped sequences first: \\n -> \n
-    text = text.split('\\\\n').join('\n');
-    text = text.split('\\\\t').join('\t');
-    text = text.split('\\\\r').join('\r');
-    text = text.split('\\\\"').join('"');
-    text = text.split("\\\\'").join("'");
-    text = text.split('\\\\\\\\').join('\\');
+    // First handle \\n (double backslash + n, 3 chars: \, \, n)
+    // In JS we write this as '\\\\n' to match literal \\n
+    let result = '';
+    let i = 0;
+    while (i < text.length) {
+        if (i < text.length - 2 && text[i] === '\\' && text[i + 1] === '\\' && text[i + 2] === 'n') {
+            // Found \\n -> convert to newline
+            result += '\n';
+            i += 3;
+        } else if (i < text.length - 2 && text[i] === '\\' && text[i + 1] === '\\' && text[i + 2] === 't') {
+            result += '\t';
+            i += 3;
+        } else if (i < text.length - 2 && text[i] === '\\' && text[i + 1] === '\\' && text[i + 2] === 'r') {
+            result += '\r';
+            i += 3;
+        } else if (i < text.length - 1 && text[i] === '\\' && text[i + 1] === 'n') {
+            // Found \n -> convert to newline
+            result += '\n';
+            i += 2;
+        } else if (i < text.length - 1 && text[i] === '\\' && text[i + 1] === 't') {
+            result += '\t';
+            i += 2;
+        } else if (i < text.length - 1 && text[i] === '\\' && text[i + 1] === 'r') {
+            result += '\r';
+            i += 2;
+        } else if (i < text.length - 1 && text[i] === '\\' && text[i + 1] === '"') {
+            result += '"';
+            i += 2;
+        } else if (i < text.length - 1 && text[i] === '\\' && text[i + 1] === "'") {
+            result += "'";
+            i += 2;
+        } else if (i < text.length - 1 && text[i] === '\\' && text[i + 1] === '\\') {
+            result += '\\';
+            i += 2;
+        } else {
+            result += text[i];
+            i += 1;
+        }
+    }
 
-    // Handle single-escaped sequences: \n -> newline
-    text = text.split('\\n').join('\n');
-    text = text.split('\\t').join('\t');
-    text = text.split('\\r').join('\r');
-    text = text.split('\\"').join('"');
-    text = text.split("\\'").join("'");
-
-    return text;
+    return result;
 }
 
 /**
