@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markdown 格式展示</title>
+    <meta name="description" content="解析並展示 Markdown 格式的 JSON 字串">
+    <link rel="stylesheet" href="styles.css">
+    <!-- Marked.js for Markdown parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>📝 Markdown 格式展示器</h1>
+            <p class="subtitle">輸入 JSON 中的 Markdown 字串，即時預覽格式化結果</p>
+        </header>
+
+        <main class="main-content">
+            <section class="input-section">
+                <div class="section-header">
+                    <span class="icon">📥</span>
+                    <h2>輸入區域</h2>
+                </div>
+                <textarea id="markdown-input" placeholder="請貼上您的 Markdown 字串..."></textarea>
+                <div class="button-group">
+                    <button id="parse-btn" class="btn btn-primary">
+                        <span class="btn-icon">✨</span>
+                        解析 Markdown
+                    </button>
+                    <button id="clear-btn" class="btn btn-secondary">
+                        <span class="btn-icon">🗑️</span>
+                        清除
+                    </button>
+                    <button id="sample-btn" class="btn btn-accent">
+                        <span class="btn-icon">📋</span>
+                        載入範例
+                    </button>
+                </div>
+            </section>
+
+            <section class="output-section">
+                <div class="section-header">
+                    <span class="icon">📤</span>
+                    <h2>預覽區域</h2>
+                </div>
+                <div id="markdown-output" class="markdown-body">
+                    <div class="placeholder-text">
+                        <span class="placeholder-icon">👆</span>
+                        <p>請輸入 Markdown 字串並點擊「解析 Markdown」按鈕</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <p>Powered by <a href="https://github.com/markedjs/marked" target="_blank">Marked.js</a></p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
